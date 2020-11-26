@@ -1,0 +1,6 @@
+Buenas, ${SENDER}!
+Esta es una prueba.
+En el amigo invisible, te ha tocado regalarle a ${RECEIVER}. Que suerte!
+Recuerda que el precio del regalo tiene que estar entre 10 y 15€.
+
+Buena suerte!
