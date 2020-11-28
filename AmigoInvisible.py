@@ -80,9 +80,23 @@ def shuffle_players(names):
     receiver_taken_names = names.copy()
     n = 0
 
+    #Players assignment
     while n < len(names):
-        sender = random.choice(sender_taken_names)
-        receiver = random.choice(receiver_taken_names)
+        #If the last 2 elements in both lists are the same person, the assigned players dictionary gets reset, as well as the process of assinging players
+        if len(sender_taken_names) == 1 and len(receiver_taken_names) == 1 and sender_taken_names[0] == receiver_taken_names[0]:
+            sender_taken_names.clear()
+            receiver_taken_names.clear()
+            sender_taken_names = names.copy()
+            receiver_taken_names = names.copy()
+            assigned_players.clear()
+            n = 0
+
+        #Take a random name from the lists
+        else:
+            sender = random.choice(sender_taken_names)
+            receiver = random.choice(receiver_taken_names)
+
+        #Only assign players to each other when different
         if sender in sender_taken_names and receiver in receiver_taken_names and sender != receiver:
             assigned_players[sender] = receiver
             sender_taken_names.remove(sender)
