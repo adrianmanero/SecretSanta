@@ -1,7 +1,7 @@
 # Secret Santa
 Secret Santa to play with your friends.
 
-The script will randomly give each one of the players the name of another player and send it via email.
+The script will randomly give each of the players the name of another player and send it via email.
 
 Just include your names and emails in a the emails.txt file.
 
