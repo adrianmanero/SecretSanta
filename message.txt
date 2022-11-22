@@ -1,5 +1,5 @@
-Hello, ${SENDER}!
+Hello, ${PERSON_BUYING_GIFT}!
 
-You have to buy a gift to ${RECEIVER}.
+You have to buy a gift to ${PERSON_RECEIVING_GIFT}.
 
 Good luck!
