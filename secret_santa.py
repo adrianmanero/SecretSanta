@@ -9,7 +9,7 @@ from email.mime.text import MIMEText
 CREDENTIALS = 'credentials.json'
 CONTACTS = 'emails.txt'
 MESSAGE_TEMPLATE_FILE = 'message.txt'
-MESSAGE_SUBJECT = 'Subject Message'
+MESSAGE_SUBJECT = 'Test'
 
 
 # Function to read the credentials file
@@ -70,8 +70,8 @@ def write_send_messages(players, result, subject, smtp):
         message = message_template.substitute(PERSON_BUYING_GIFT=buyer, PERSON_RECEIVING_GIFT=receiver)
 
         # Set up the parameters of the message
-        msg['From'] = players.get(buyer)
-        msg['To'] = players.get(receiver)
+        msg['From'] = players.get(receiver)
+        msg['To'] = players.get(buyer)
         msg['Subject'] = subject
 
         # Message body
