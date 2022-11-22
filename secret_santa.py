@@ -6,6 +6,12 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
 
+CREDENTIALS = 'credentials.json'
+CONTACTS = 'emails.txt'
+MESSAGE_TEMPLATE_FILE = 'message.txt'
+MESSAGE_SUBJECT = 'Subject Message'
+
+
 # Function to read the credentials file
 def parse_json(filename):
     with open(filename, mode='r') as json_file:
@@ -23,10 +29,11 @@ def get_contacts(filename):
     players = {}
 
     with open(filename, mode='r', encoding='utf-8') as contacts_file:
+        # Iterate over the lines of the file and split each one by a whitespace
         for contact in contacts_file:
-            name = contact.split()[0]
-            email = contact.split()[1]
+            name, email = contact.split()
 
+            # Store the data
             names.append(name)
             players[name] = email
 
@@ -36,9 +43,9 @@ def get_contacts(filename):
 # Function to read a template file and return a template object made from its contents
 def read_template(filename):
     with open(filename, mode='r', encoding='utf8') as template_file:
-        template_file_conten = template_file.read()
+        template_file_content = template_file.read()
 
-    return Template(template_file_conten)
+    return Template(template_file_content)
 
 
 # Setting up the SMTP server
@@ -51,19 +58,19 @@ def smtp_setup(SMTP_SERVER, EMAIL, PASS):
 
 
 # Write the message
-def write_send_messages(players, result, subject, s):
-    message_template = read_template('message.txt')
+def write_send_messages(players, result, subject, smtp):
+    message_template = read_template(MESSAGE_TEMPLATE_FILE)
 
     # Write and send the messages
-    for sender, receiver in result.items():
+    for buyer, receiver in result.items():
         # Cretae a message
         msg = MIMEMultipart()
 
         # Person name for the message template
-        message = message_template.substitute(SENDER=sender, RECEIVER=receiver)
+        message = message_template.substitute(PERSON_BUYING_GIFT=buyer, PERSON_RECEIVING_GIFT=receiver)
 
         # Set up the parameters of the message
-        msg['From'] = players.get(sender)
+        msg['From'] = players.get(buyer)
         msg['To'] = players.get(receiver)
         msg['Subject'] = subject
 
@@ -71,45 +78,36 @@ def write_send_messages(players, result, subject, s):
         msg.attach(MIMEText(message, 'plain'))
         
         # Send the message via the server
-        s.send_message(msg)
+        smtp.send_message(msg)
 
         del msg
 
 
 # Function that shuffles the players and assigns secret santas
 def shuffle_players(names):
-    result = {}
-    receivers = []
-
-    for name in names:
-        # Get random receiver from the list (different from the sender) and insert it in the results dictionary
-        receiver = random.choice([n for n in names if n != name and n not in receivers])
-        result[name] = receiver
-
-        # Mark the name as used, so every person receives one present
-        receivers.append(receiver)
-
-    return result
+    return {names[i]:names[(i+1) % len(names)] for i in range(len(names))}
 
 
 def main():
     # Get JSON information
-    SMTP_SERVER, EMAIL, PASS = parse_json('credentials.json')
+    SMTP_SERVER, EMAIL, PASS = parse_json(CREDENTIALS)
 
     # Setting up the SMTP server
-    s = smtp_setup(SMTP_SERVER, EMAIL, PASS)
+    smtp = smtp_setup(SMTP_SERVER, EMAIL, PASS)
 
     # Obtain names and emails
-    names, players = get_contacts('emails.txt')
+    names, players = get_contacts(CONTACTS)
 
     # Shuffle players
     result = shuffle_players(names)
 
+    print(result)
+
     # Write and send the messages
-    write_send_messages(players, result, 'Secret Santa', s)
+    write_send_messages(players, result, MESSAGE_SUBJECT, smtp)
 
     # Terminate the SMTP connection and close it
-    s.quit()
+    smtp.quit()
 
     print("Secret Santas has been sent. Good luck!")
 
